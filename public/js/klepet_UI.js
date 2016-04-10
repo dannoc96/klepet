@@ -1,11 +1,23 @@
-function divElementEnostavniTekst(sporocilo) {
-  var jeSmesko = sporocilo.indexOf('http://sandbox.lavbic.net/teaching/OIS/gradivo/') > -1;
-  if (jeSmesko) {
-    sporocilo = sporocilo.replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace('&lt;img', '<img').replace('png\' /&gt;', 'png\' />');
+function divElementEnostavniTekst(tags, sporocilo) {
+  if (tags) {
     return $('<div style="font-weight: bold"></div>').html(sporocilo);
   } else {
     return $('<div style="font-weight: bold;"></div>').text(sporocilo);
   }
+}
+
+function urediBesedilo(besedilo){
+  //xss
+  besedilo = besedilo.replace(/>/g, '&gt;').replace(/</g, '&lt;');
+  //images
+  var zadetki = besedilo.match(/https?:\/\/.+?\.(png|jpg|gif)/g);
+  if(null !== zadetki){
+    for(var i = 0; i<zadetki.length; i++){
+      besedilo += '<img src="' + zadetki[i] + '" class="image"/>';
+    }
+  }
+  
+  return besedilo;
 }
 
 function divElementHtmlTekst(sporocilo) {
@@ -20,12 +32,14 @@ function procesirajVnosUporabnika(klepetApp, socket) {
   if (sporocilo.charAt(0) == '/') {
     sistemskoSporocilo = klepetApp.procesirajUkaz(sporocilo);
     if (sistemskoSporocilo) {
+      sistemskoSporocilo = urediBesedilo(sistemskoSporocilo);
       $('#sporocila').append(divElementHtmlTekst(sistemskoSporocilo));
     }
   } else {
+    sporocilo = urediBesedilo(sporocilo);
     sporocilo = filtirirajVulgarneBesede(sporocilo);
     klepetApp.posljiSporocilo(trenutniKanal, sporocilo);
-    $('#sporocila').append(divElementEnostavniTekst(sporocilo));
+    $('#sporocila').append(divElementEnostavniTekst(1, sporocilo));
     $('#sporocila').scrollTop($('#sporocila').prop('scrollHeight'));
   }
 
@@ -74,7 +88,7 @@ $(document).ready(function() {
   });
 
   socket.on('sporocilo', function (sporocilo) {
-    var novElement = divElementEnostavniTekst(sporocilo.besedilo);
+    var novElement = divElementEnostavniTekst(1, sporocilo.besedilo);
     $('#sporocila').append(novElement);
   });
   
@@ -84,7 +98,7 @@ $(document).ready(function() {
     for(var kanal in kanali) {
       kanal = kanal.substring(1, kanal.length);
       if (kanal != '') {
-        $('#seznam-kanalov').append(divElementEnostavniTekst(kanal));
+        $('#seznam-kanalov').append(divElementEnostavniTekst(0, kanal));
       }
     }
 
@@ -98,7 +112,7 @@ $(document).ready(function() {
     $('#seznam-uporabnikov').empty();
     for (var i=0; i < uporabniki.length; i++) {
       var uporabnik = uporabniki[i];
-      $element = divElementEnostavniTekst(uporabnik);
+      $element = divElementEnostavniTekst(0, uporabnik);
       $element.click(function(){
         var vzdevek = $(this).text();
         $("#poslji-sporocilo").val("/zasebno " + "\"" + vzdevek +  "\" ");
