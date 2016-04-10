@@ -58,7 +58,12 @@ a {
   font: 10px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-.image{
+
+.image, .youtube{
   margin-left: 20px !important;
   width: 200px !important;
+}
+
+.youtube{
+  height: 150px !important;
 }

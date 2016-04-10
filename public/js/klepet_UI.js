@@ -16,6 +16,13 @@ function urediBesedilo(besedilo){
       besedilo += '<img src="' + zadetki[i] + '" class="image"/>';
     }
   }
+  //youtube
+  var temp = besedilo; var regex = /https:\/\/www\.youtube\.com\/watch\?v=(\S+)/g; var zadetki = regex.exec(besedilo);
+  while (null != zadetki) {
+     temp = temp + '<iframe src="https://www.youtube.com/embed/' + zadetki[1] + '" allowfullscreen class="youtube"></iframe>';
+     zadetki = regex.exec(besedilo);
+  }
+  besedilo = temp;
   
   return besedilo;
 }
