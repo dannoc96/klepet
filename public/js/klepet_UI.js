@@ -97,7 +97,14 @@ $(document).ready(function() {
   socket.on('uporabniki', function(uporabniki) {
     $('#seznam-uporabnikov').empty();
     for (var i=0; i < uporabniki.length; i++) {
-      $('#seznam-uporabnikov').append(divElementEnostavniTekst(uporabniki[i]));
+      var uporabnik = uporabniki[i];
+      $element = divElementEnostavniTekst(uporabnik);
+      $element.click(function(){
+        var vzdevek = $(this).text();
+        $("#poslji-sporocilo").val("/zasebno " + "\"" + vzdevek +  "\" ");
+        $("#poslji-sporocilo").focus();
+      });
+      $('#seznam-uporabnikov').append($element);
     }
   });
 
